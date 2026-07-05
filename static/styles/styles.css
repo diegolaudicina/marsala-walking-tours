@@ -1,0 +1,468 @@
+:root {
+    /* color palette variables */
+    --marsala-primary: #955251;
+    --marsala-dark: #6C3A3A;
+    --marsala-light: #B76D6C;
+    --sand-accent: #E29578;
+    --sand-light: #FDFBF7;
+    --slate-text: #2C3E50;
+    --slate-light: #4A6572;
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --glass-dark-bg: rgba(44, 62, 80, 0.7);
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--sand-light);
+    color: var(--slate-text);
+}
+
+.glass-header {
+    background: rgba(44, 62, 80, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    transform: translateZ(0);
+    /* Force GPU acceleration */
+    will-change: backdrop-filter;
+}
+
+.btn-marsala {
+    background-color: var(--marsala-primary);
+    color: white;
+    border: 2px solid transparent;
+    border-radius: 50rem;
+    /* Pill shape */
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(149, 82, 81, 0.3);
+}
+
+.btn-marsala:hover,
+.btn-marsala:focus,
+.btn-check:checked+.btn-marsala,
+.btn-check:active+.btn-marsala,
+.btn-marsala.active,
+.btn-marsala:active {
+    background-color: var(--marsala-dark);
+    color: white;
+}
+
+.btn-marsala:focus-visible {
+    outline: 3px solid var(--marsala-primary);
+    outline-offset: 2px;
+}
+
+.btn-outline-marsala {
+    color: var(--marsala-primary);
+    border: 2px solid var(--marsala-primary);
+    background-color: transparent;
+    border-radius: 50rem;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-marsala:hover,
+.btn-outline-marsala:focus,
+.btn-check:checked+.btn-outline-marsala,
+.btn-check:active+.btn-outline-marsala,
+.btn-outline-marsala.active,
+.btn-outline-marsala:active {
+    background-color: var(--marsala-primary);
+    color: white;
+}
+
+.btn-outline-marsala:focus-visible {
+    outline: 3px solid var(--marsala-primary);
+    outline-offset: 2px;
+}
+
+.btn-sand {
+    background-color: var(--sand-accent);
+    color: white;
+    border: 2px solid transparent;
+    border-radius: 50rem;
+    transition: all 0.3s ease;
+}
+
+.btn-sand:hover,
+.btn-sand:focus,
+.btn-check:checked+.btn-sand,
+.btn-check:active+.btn-sand,
+.btn-sand.active,
+.btn-sand:active {
+    background-color: #925a45;
+    color: white;
+}
+
+.btn-sand:focus-visible {
+    outline: 3px solid var(--sand-accent);
+    outline-offset: 2px;
+}
+
+.btn-outline-sand {
+    color: var(--sand-light);
+    border: 2px solid var(--sand-light);
+    background-color: transparent;
+    border-radius: 50rem;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-sand:hover,
+.btn-outline-sand:focus,
+.btn-check:checked+.btn-outline-sand,
+.btn-check:active+.btn-outline-sand,
+.btn-outline-sand.active,
+.btn-outline-sand:active {
+    background-color: var(--sand-light);
+    color: var(--slate-text);
+}
+
+.btn-outline-sand:focus-visible {
+    outline: 3px solid var(--sand-light);
+    outline-offset: 2px;
+}
+
+.btn-outline-sand-accent {
+    color: var(--sand-accent);
+    border: 2px solid var(--sand-accent);
+    background-color: transparent;
+    border-radius: 50rem;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-sand-accent:hover,
+.btn-outline-sand-accent:focus,
+.btn-check:checked+.btn-outline-sand-accent,
+.btn-check:active+.btn-outline-sand-accent,
+.btn-outline-sand-accent.active,
+.btn-outline-sand-accent:active {
+    background-color: var(--sand-accent);
+    color: white;
+}
+
+.btn-outline-sand-accent:focus-visible {
+    outline: 3px solid var(--sand-accent);
+    outline-offset: 2px;
+}
+
+.modern-card {
+    border: none;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 8px 24px rgba(44, 62, 80, 0.05);
+    overflow: hidden;
+}
+
+.popular-card {
+    width: 18rem;
+    border: none;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 8px 24px rgba(44, 62, 80, 0.05);
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    overflow: hidden;
+    will-change: transform, box-shadow;
+}
+
+.popular-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(44, 62, 80, 0.1);
+}
+
+.tour-card-img {
+    height: 180px;
+    object-fit: cover;
+}
+
+.reservations-card {
+    background: white;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(44, 62, 80, 0.05);
+    margin-bottom: 15px;
+    padding: 15px;
+}
+
+.tour-carousel-img {
+    height: 400px;
+    object-fit: cover;
+    border-radius: 16px;
+}
+
+.index-carousel-img {
+    height: 800px;
+    object-fit: cover;
+}
+
+.tour-description {
+    white-space: pre-wrap;
+    line-height: 1.7;
+}
+
+.tour-booking-card {
+    top: 6rem;
+}
+
+.index-carousel-btn {
+    width: 12px;
+    height: 12px;
+}
+
+.edit-btn-forbidden {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.report-photo {
+    max-height: 150px;
+    border-radius: 8px;
+}
+
+.profile-pic-sm {
+    width: 28px;
+    height: 28px;
+    object-fit: cover;
+    border: 2px solid white;
+}
+
+.profile-pic-md {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--marsala-light);
+}
+
+.profile-pic-lg {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-pic-admin {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.flash-notif {
+    min-width: 250px;
+    max-width: 350px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.badge-marsala {
+    background-color: var(--marsala-primary);
+    color: white;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 700;
+    color: var(--slate-text);
+}
+
+.text-marsala-primary {
+    color: var(--marsala-primary) !important;
+}
+
+.text-marsala-dark {
+    color: var(--marsala-dark) !important;
+}
+
+.text-sand-light {
+    color: var(--sand-light) !important;
+}
+
+.text-slate {
+    color: var(--slate-text) !important;
+}
+
+/* Custom Background Colors */
+.bg-marsala-primary {
+    background-color: var(--marsala-primary) !important;
+}
+
+.bg-marsala-dark {
+    background-color: var(--marsala-dark) !important;
+}
+
+.bg-sand-accent {
+    background-color: var(--sand-accent) !important;
+}
+
+.bg-slate-light {
+    background-color: var(--slate-light) !important;
+}
+
+/* Specific Element Classes */
+.hero-overlay {
+    background: rgba(44, 62, 80, 0.5);
+}
+
+.hero-text-shadow-light {
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.hero-text-shadow-sm {
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+}
+
+.profile-icon-lg {
+    font-size: 4rem;
+}
+
+.report-photo-admin {
+    height: 200px;
+    object-fit: cover;
+}
+
+.hero-btn {
+    transition: all 0.3s ease;
+}
+
+.hero-btn:hover,
+.hero-btn:focus {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(149, 82, 81, 0.5) !important;
+}
+
+/* Sliding Toggle Switch */
+.sliding-toggle {
+    display: inline-flex;
+    background-color: var(--sand-light);
+    border-radius: 50rem;
+    padding: 4px;
+    position: relative;
+    border: none;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.sliding-label {
+    width: 120px;
+    border: none;
+    border-radius: 50rem;
+    font-weight: 600;
+    color: var(--slate-text);
+    z-index: 2;
+    transition: color 0.3s ease;
+    background: transparent !important;
+}
+
+.sliding-toggle .btn-check:checked+.sliding-label {
+    color: white;
+}
+
+.sliding-toggle .slider {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: 120px;
+    background-color: var(--marsala-primary);
+    border-radius: 50rem;
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    z-index: 1;
+    box-shadow: 0 2px 6px rgba(149, 82, 81, 0.4);
+}
+
+#btn-participant:checked~.slider {
+    transform: translateX(100%);
+}
+
+.flash-container {
+    z-index: 1050 !important;
+}
+
+.r-photo-container {
+    background-color: #f8f9fa;
+}
+
+.r-photo {
+    max-height: 250px; 
+    object-fit: cover;
+}
+
+.info-container {
+    background-color: var(--sand-light);
+}
+
+/*Slider coloring logic*/
+/*Slider thumb*/
+.form-range::-webkit-slider-thumb {
+    background-color: var(--marsala-primary);
+}
+
+.form-range::-moz-range-thumb {
+    background-color: var(--marsala-primary);
+}
+
+/*Slider when clicked*/
+.form-range:focus::-webkit-slider-thumb {
+    box-shadow: 0 0 0 1px #fff, 0 0 0 0.25rem rgba(149, 82, 81, 0.25);
+}
+
+.form-range:focus::-moz-range-thumb {
+    box-shadow: 0 0 0 1px #fff, 0 0 0 0.25rem rgba(149, 82, 81, 0.25);
+}
+
+.form-range:active::-webkit-slider-thumb {
+    background-color: var(--marsala-dark);
+}
+
+.form-range:active::-moz-range-thumb {
+    background-color: var(--marsala-dark);
+}
+
+/*Checkbox coloring logic*/
+/*Checked*/
+.form-check-input:checked {
+    background-color: var(--marsala-primary);
+    border-color: var(--marsala-primary);
+}
+
+/*Border and shadow when focused*/
+.form-check-input:focus {
+    border-color: var(--marsala-light);
+    box-shadow: 0 0 0 0.25rem rgba(149, 82, 81, 0.25);
+}
+
+/* Style for text, date or dropdowns */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--marsala-light);
+    box-shadow: 0 0 0 0.25rem rgba(149, 82, 81, 0.25);
+}
+
+/* Theme for calendar date selector */
+input[type="date"].form-control {
+    accent-color: var(--marsala-primary);
+}
+
+/* Colours for breadcrumbs */
+.breadcrumb-item a {
+    color: var(--marsala-primary);
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--marsala-dark);
+}
+
+.breadcrumb-item.active {
+    color: var(--slate-light);
+    font-weight: 400;
+}

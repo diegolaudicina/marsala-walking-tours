@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Marsala Walking Tours{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+	<ol class="breadcrumb">
+		<li class="breadcrumb-item"><a href="{{ url_for('home') }}" class="text-decoration-none">Home</a></li>
+		<li class="breadcrumb-item active" aria-current="page">Login</li>
+	</ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<main class="container my-5">
+	<div class="row align-items-start">
+		<aside class="col-md-7 col-lg-6 p-5 px-md-5 mb-5 mb-md-0 bg-white rounded-4 modern-card border-0">
+			<div class="d-flex justify-content-between align-items-center pb-4">
+				<h1 id="form-title" class="mb-0">Login as a guide</h1>
+
+				<!-- Toggle switch -->
+				<div class="sliding-toggle" role="group" aria-label="Toggle user type">
+					<input type="radio" class="btn-check" name="user_type_toggle" id="btn-guide" checked
+						onchange="toggleLoginForm()">
+					<label class="btn sliding-label" for="btn-guide">Guide</label>
+
+					<input type="radio" class="btn-check" name="user_type_toggle" id="btn-participant"
+						onchange="toggleLoginForm()">
+					<label class="btn sliding-label" for="btn-participant">Participant</label>
+
+					<div class="slider"></div>
+				</div>
+			</div>
+
+			<!-- Guide Form -->
+			<div id="guide-form-container">
+				<form action="{{ url_for('authenticate') }}" method="POST" enctype="multipart/form-data">
+					<!--Default value, used for backend managing-->
+					<input type="hidden" name="role" value="guide">
+
+					<label class="form-label" for="guide_email">Email address</label>
+					<input class="form-control" type="email" name="email" id="guide_email"
+						placeholder="Enter your email address" required>
+					<br>
+
+					<label class="form-label" for="guide_password">Password</label>
+					<input class="form-control" type="password" name="password" id="guide_password"
+						placeholder="Enter your password" required>
+					<br>
+
+
+					<button type="submit" class="btn btn-marsala">Login</button>
+					<button type="reset" class="btn btn-outline-marsala">Clear form</button>
+				</form>
+			</div>
+
+			<!-- Participant Form -->
+			<div id="participant-form-container" class="d-none">
+				<form action="{{ url_for('authenticate') }}" method="POST" enctype="multipart/form-data">
+					<!--Default value, used for backend managing-->
+					<input type="hidden" name="role" value="participant">
+
+					<label class="form-label" for="participant_email">Email address</label>
+					<input class="form-control" type="email" name="email" id="participant_email"
+						placeholder="Enter your email address" required>
+					<br>
+
+					<label class="form-label" for="participant_password">Password</label>
+					<input class="form-control" type="password" name="password" id="participant_password"
+						placeholder="Enter your password" required>
+					<br>
+
+
+					<button type="submit" class="btn btn-marsala">Login</button>
+					<button type="reset" class="btn btn-outline-marsala">Clear form</button>
+				</form>
+			</div>
+		</aside>
+
+		<section class="col-md-5 col-lg-6">
+			<div class="p-5 text-center bg-white rounded-4 modern-card border-0">
+				<h2 class="fw-bold pb-4 text-marsala-primary">Want to create an account?</h2>
+				<a href="{{ url_for('registration_page') }}" class="btn btn-outline-marsala btn-lg px-5 rounded-pill">Go
+					to registration page</a>
+			</div>
+		</section>
+	</div>
+</main>
+{% endblock %}

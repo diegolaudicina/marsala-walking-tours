@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}{{current_user.first_name}} profile - MWT{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('home') }}" class="text-decoration-none">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Profile</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<main class="container">
+    <header class="d-flex align-items-center mb-4 mt-3 p-3 bg-light rounded shadow-sm border">
+        {% if current_user.profile_image %}
+        <img src="{{ url_for('static', filename=current_user.profile_image.lstrip('/')) }}" alt="Profile Image"
+            class="rounded-circle me-3 border shadow-sm profile-pic-lg">
+        {% else %}
+        <i class="bi bi-person-circle text-muted me-3 profile-icon-lg"></i>
+        {% endif %}
+        <div>
+            <h2 class="mb-0 fw-bold">Welcome, {{ current_user.first_name }} {{ current_user.last_name }}</h2>
+            <p class="text-muted mb-0"><i class="bi bi-person-badge me-1"></i> Guide Profile</p>
+        </div>
+    </header>
+
+    <section>
+        <h3 class="py-2">Your tours</h3>
+
+        {% if not tours %}
+        <p>No tours to show</p>
+        {% else %}
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for tour in tours %}
+            <article class="col">
+                <div class="card h-100 shadow-sm border">
+                    <div class="card-body d-flex flex-column">
+                        <h4 class="card-title fw-bold mb-3">{{ tour.title }}</h4>
+
+                        <p class="card-text mb-1"><strong><i class="bi bi-translate"></i> Language:</strong> {{
+                            tour.language
+                            }}
+                        </p>
+                        <p class="card-text mb-1"><strong><i class="bi bi-clock-history"></i> Duration:</strong> {{
+                            tour.duration }} min</p>
+                        <p class="card-text mb-1"><strong><i class="bi bi-geo-alt"></i> Meeting point:</strong> {{
+                            tour.meeting_point }}</p>
+                        <p class="card-text mb-1"><strong><i class="bi bi-people"></i> Max participants:</strong> {{
+                            tour.max_participants }}</p>
+
+                        {% if tour.dates %}
+                        <div class="mt-3">
+                            <h6 class="fw-bold mb-2 text-marsala-primary">Scheduled Dates & Reservations</h6>
+                            {% for date in tour.dates %}
+                            <div class="mb-3 border-bottom pb-2">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <strong><i class="bi bi-calendar-event"></i> {{ date.date }}</strong>
+                                    <div>
+                                        <span class="badge badge-marsala text-dark">{{ date.actual_participants }} / {{
+                                            tour.max_participants }} {% if date.has_passed and date.report_photo
+                                            %}attended{% else %}expected{% endif %}</span>
+                                        {% if date.has_passed %}
+                                        <a href="{{ url_for('report_tour_page', d_id=date.id) }}"
+                                            class="btn btn-sm btn-outline-marsala ms-2">
+                                            <i class="bi bi-file-earmark-text"></i> {% if date.report_photo %}Edit
+                                            Report{% else %}Report{% endif %}
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <ul class="list-unstyled ms-3 mb-0 small">
+                                    {% for res in date.reservations %}
+                                    <li>
+                                        <i class="bi bi-person"></i> <strong>{{ res.primary_participant }}</strong>
+                                        {% if res.extra_participants %}
+                                        <span class="text-muted"> (+ {{ res.extra_participants|join(', ') }})</span>
+                                        {% endif %}
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted small mt-2"><em>No reservations yet for this tour.</em></p>
+                        {% endif %}
+
+                        <div class="mt-auto pt-3 border-top d-flex gap-2 align-items-center">
+                            <a href="{{ url_for('tour_page', tour_id = tour.id) }}"
+                                class="btn btn-outline-marsala btn-sm">
+                                <i class="bi bi-eye"></i> View Tour
+                            </a>
+
+                            <!--Edit-->
+                            <a href="{{ url_for('edit_tour_page', tour_id = tour.id) }}"
+                                class="btn btn-outline-sand-accent btn-sm">
+                                <i class="bi bi-pencil-square"></i> Edit
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

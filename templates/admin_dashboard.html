@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - MWT{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('home') }}" class="text-decoration-none">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Admin Dashboard</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<main class="container my-4">
+    <h2 class="mb-4">Platform Administration</h2>
+
+    <!-- Statistics Section -->
+    <section>
+        <h4 class="mb-3">General Statistics</h4>
+        <div class="row g-3 mb-5">
+            <div class="col-md-3">
+                <div class="card bg-marsala-primary text-white h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Total Guides</h5>
+                        <p class="card-text fs-2 fw-bold">{{ total_guides }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-slate-light text-white h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Total Participants</h5>
+                        <p class="card-text fs-2 fw-bold">{{ total_participants }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-sand-accent text-white h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Total Tours</h5>
+                        <p class="card-text fs-2 fw-bold">{{ total_tours }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-marsala-dark text-white h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Total Reservations</h5>
+                        <p class="card-text fs-2 fw-bold">{{ total_reservations }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reservations per language -->
+    <section class="row mb-5">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Reservations per Language</h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for stat in reservations_per_language %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ stat.language }}
+                        <span class="badge badge-marsala rounded-pill">{{ stat.count }}</span>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item text-muted">No reservations found.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Post-Tour Reports Section -->
+    <section>
+        <h4 class="mb-3">Recent Post-Tour Reports</h4>
+        {% if reports %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+            {% for report in reports %}
+            <article class="col">
+                <div class="card h-100 shadow-sm">
+                    {% if report.report_photo %}
+                    <img src="{{ url_for('static', filename='images/reports/' + report.report_photo) }}"
+                        class="card-img-top report-photo-admin" alt="Report Photo">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ report.title }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Guide: {{ report.first_name }} {{ report.last_name }}
+                        </h6>
+                        <p class="card-text mb-1"><i class="bi bi-calendar-event"></i> Date: {{ report.date }}</p>
+                        <p class="card-text"><i class="bi bi-people"></i> Actual Participants: {{
+                            report.actual_participants }}</p>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info mb-5">No post-tour reports have been submitted yet.</div>
+        {% endif %}
+    </section>
+
+    <!-- Guides List Section -->
+    <section>
+        <h4 class="mb-3">Registered Guides</h4>
+        {% if guides %}
+        <div class="accordion" id="guidesAccordion">
+            {% for guide in guides %}
+            <article class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ guide.id }}">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapse{{ guide.id }}" aria-expanded="false"
+                        aria-controls="collapse{{ guide.id }}">
+                        {% if guide.profile_image %}
+                        <img src="{{ url_for('static', filename=guide.profile_image.lstrip('/')) }}" alt="Profile"
+                            class="rounded-circle me-3 shadow-sm border profile-pic-admin">
+                        {% else %}
+                        <i class="bi bi-person-badge me-3 fs-4 text-muted"></i>
+                        {% endif %}
+                        <strong>{{ guide.first_name }} {{ guide.last_name }}</strong>
+                    </button>
+                </h2>
+                <div id="collapse{{ guide.id }}" class="accordion-collapse collapse"
+                    aria-labelledby="heading{{ guide.id }}" data-bs-parent="#guidesAccordion">
+                    <div class="accordion-body">
+                        <!-- Guide Main Info -->
+                        <div class="mb-3 p-3 bg-light rounded border">
+                            <p class="mb-1"><i class="bi bi-envelope"></i> <strong>Email:</strong> {{
+                                guide.email_address }}</p>
+                            <p class="mb-0"><i class="bi bi-translate"></i> <strong>Spoken Languages:</strong>
+                                {% if guide.languages %}
+                                {{ guide.languages | join(', ') }}
+                                {% else %}
+                                <span class="text-muted">None specified</span>
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <!-- Guide's Tours -->
+                        <h5 class="mt-4 mb-3">Tours Created</h5>
+                        {% if guide.tours %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Language</th>
+                                        <th>Duration (min)</th>
+                                        <th>Meeting Point</th>
+                                        <th>Max Participants</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for tour in guide.tours %}
+                                    <tr>
+                                        <td><strong>{{ tour.title }}</strong><br><small class="text-muted">{{
+                                                tour.description[:50] }}...</small></td>
+                                        <td>{{ tour.language }}</td>
+                                        <td>{{ tour.duration }}</td>
+                                        <td>{{ tour.meeting_point }}</td>
+                                        <td>{{ tour.max_participants }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-muted">This guide has not created any tours yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">No guides are registered on the platform.</div>
+        {% endif %}
+    </section>
+
+</main>
+{% endblock %}

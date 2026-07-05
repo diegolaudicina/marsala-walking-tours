@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>{% block title %}{% endblock %}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="UTF-8">
+
+	<!-- Google Font "Outfit" import  -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+	<!--Bootstrap import-->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+		integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+	<!--CSS Stylesheet import (Must be after Bootstrap!)-->
+	<link rel="stylesheet" href="{{ url_for('static', filename='styles/styles.css') }}?v=1.2">
+
+	<!--Bootstrap Icons import-->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+	<!--Wine glass favicon import-->
+	<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
+	<link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
+
+	<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</head>
+
+<body>
+	<!--Header-->
+	<header class="py-3 glass-header shadow-sm">
+		<div class="container">
+			<div class="d-flex flex-wrap align-items-center justify-content-between w-100">
+				<a href="{{ url_for('home') }}"
+					class="d-flex align-items-center text-white text-decoration-none me-auto">
+					<h1 class="h3 mb-0 fw-bold text-sand-light">Marsala Walking Tours</h1>
+				</a>
+
+				<div class="text-end d-flex align-items-center">
+					{% if not current_user.is_authenticated %}
+					<a href="{{ url_for('login_page') }}" role="button" class="btn btn-outline-sand me-2">Login</a>
+					<a href="{{ url_for('registration_page') }}" role="button" class="btn btn-sand fw-bold">Become a
+						guide</a>
+					{% elif current_user.is_authenticated %}
+					<a href="{{ url_for('profile') }}" role="button"
+						class="btn btn-sand d-inline-flex align-items-center me-2">
+						{% if current_user.profile_image %}
+						<img src="{{ url_for('static', filename=current_user.profile_image.lstrip('/')) }}"
+							alt="Profile" class="rounded-circle me-2 profile-pic-sm">
+						{% endif %}
+						{{ current_user.first_name }}
+					</a>
+					{% if current_user.role == 'guide' %}
+					<a href="{{ url_for('create_tour') }}" role="button" class="btn btn-marsala me-2">Create tour</a>
+					{% elif current_user.role == 'admin' %}
+					<a href="{{ url_for('admin_dashboard') }}" role="button" class="btn btn-marsala me-2">Admin
+						Dashboard</a>
+					{% endif %}
+					<a href="{{ url_for('tours_page') }}"
+						class="btn btn-outline-sand me-2 d-none d-md-inline-flex align-items-center">
+						All Tours
+					</a>
+					<a href="{{ url_for('logout') }}" role="button" class="btn btn-outline-sand">Logout</a>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<!--Flash messages floating container-->
+	<aside class="position-fixed top-0 start-50 translate-middle-x p-4 mt-5 flash-container pe-none">
+		{% with messages = get_flashed_messages(with_categories=true) %}
+		{% if messages %}
+		{% for category, message in messages %}
+		<div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show shadow flash-notif pe-auto opacity-100"
+			role="alert">
+			<strong>{{ message }}</strong>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		{% endfor %}
+		{% endif %}
+		{% endwith %}
+	</aside>
+
+	<nav class="container mt-3" aria-label="Breadcrumb Navigation">
+		<!--Breadcrumbs-->
+		{% block breadcrumbs %}{% endblock %}
+	</nav>
+
+	{% block content %}
+	{% endblock %}
+
+	<!--Footer-->
+	<div class="container">
+		<footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+			<div class="col-md-6 d-flex align-items-center">
+				<span class="mb-3 mb-md-0 text-body-secondary">© Diego Laudicina - Introduction to Web Applications
+					2025/2026</span>
+			</div>
+		</footer>
+	</div>
+
+	<!--Bootstrap JS import-->
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+		crossorigin="anonymous"></script>
+</body>
+
+</html>

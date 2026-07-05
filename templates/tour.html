@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ tour.title }} - MWT{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('home') }}" class="text-decoration-none">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('tours_page') }}" class="text-decoration-none">Tours</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ tour.title }}</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<main class="container my-5">
+    <div class="row">
+        <article class="col-lg-8">
+            <h1 class="fw-bold mb-3 text-marsala-primary">{{ tour.title }}</h1>
+            <div class="text-muted mb-4 d-flex align-items-center flex-wrap">
+                {% if tour.guide_profile_image %}
+                <img src="{{ url_for('static', filename=tour.guide_profile_image.lstrip('/')) }}" alt="Guide"
+                    class="rounded-circle me-2 shadow-sm profile-pic-md">
+                {% else %}
+                <i class="bi bi-person-badge me-2 fs-4"></i>
+                {% endif %}
+                <span>Guide: <strong class="ms-1 me-3">{{ tour.guide_first }} {{ tour.guide_last }}</strong></span>
+                <span class="text-muted mx-1">|</span>
+                <span class="ms-2"><i class="bi bi-translate me-1"></i> Language: <strong class="ms-1 me-3">{{
+                        tour.language }}</strong></span>
+                <span class="text-muted mx-1">|</span>
+                <span class="ms-2"><i class="bi bi-clock me-1"></i> Duration: <strong class="ms-1">{{ tour.duration }}
+                        min</strong></span>
+            </div>
+
+            {% if tour.photos %}
+            <div id="tourCarousel" class="carousel slide mb-5 shadow-sm rounded overflow-hidden"
+                data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% for photo in tour.photos %}
+                    <div class="carousel-item {% if loop.first %}active{% endif %}">
+                        <img src="{{ url_for('static', filename='images/' ~ photo) }}"
+                            class="d-block w-100 tour-carousel-img" alt="Tour photo">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if tour.photos|length > 1 %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#tourCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#tourCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <h2 class="h4 fw-bold mb-3 text-marsala-dark">Description</h2>
+            <p class="tour-description">{{ tour.description }}</p>
+
+            <section>
+                <h3 class="h4 fw-bold mt-5 mb-3 text-marsala-dark">Itinerary Stops</h3>
+                <ol class="list-group list-group-numbered mb-4">
+                    {% for stop in tour.stops %}
+                    <li class="list-group-item">{{ stop }}</li>
+                    {% else %}
+                    <li class="list-group-item text-muted">No specific stops defined.</li>
+                    {% endfor %}
+                </ol>
+            </section>
+        </article>
+
+        <aside class="col-lg-4">
+            <div class="card modern-card sticky-top tour-booking-card">
+                <div class="card-body p-4">
+                    <h4 class="h5 fw-bold mb-3 text-marsala-primary">Book this tour</h4>
+                    <p class="mb-2"><i class="bi bi-geo-alt-fill text-danger"></i> <strong>Meeting Point:</strong><br>
+                        {{ tour.meeting_point }}</p>
+                    <p class="mb-4"><i class="bi bi-people-fill text-marsala-primary"></i> <strong>Max
+                            Participants:</strong>
+                        {{tour.max_participants }}</p>
+
+                    <form action="{{ url_for('book_tour_page', tour_id=tour.id) }}" method="GET">
+                        <!-- GET method so that the preselected date is already chosen in the book_tour_page -->
+
+                        {% if current_user.is_authenticated and current_user.role == 'participant' %}
+                        <div class="mb-4">
+                            <label for="booking_date" class="form-label fw-bold">Select Date & Time</label>
+                            <select class="form-select" id="booking_date" name="booking_date" required>
+                                <option value="" selected disabled>Choose a date...</option>
+                                {% for date in upcoming_dates %}
+                                {% if date.full_date in user_booked_dates %}
+                                <option value="" disabled class="text-muted">
+                                    {{ date.display_date }} (Already booked)
+                                </option>
+                                {% elif date.is_overlap %}
+                                <option value="" disabled class="text-danger fw-bold">
+                                    {{ date.display_date }} (Tour overlap)
+                                </option>
+                                {% else %}
+                                <option value="{{ date.full_date }}">
+                                    {{ date.display_date }} ({{ date.available_spots }} spots left)
+                                </option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            {% if not upcoming_dates %}
+                            <span class="form-text text-danger">Sorry, there are no upcoming available dates for this
+                                tour.
+                        </div>
+                        {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="d-grid">
+                    {% if current_user.is_authenticated and current_user.role == 'participant' %}
+                    <button type="submit" class="btn btn-marsala btn-lg" {% if not upcoming_dates %} disabled {% endif
+                        %}>Book Now</button>
+                    {% elif current_user.is_authenticated and current_user.role == 'guide' and current_user.id ==
+                    tour.g_id %}
+                    <div class="mt-4 mb-4 p-3 bg-light border rounded">
+                        <h5 class="fw-bold">Manage tour</h5>
+                        <p class="text-muted small">You created this tour. As long as no one scheduled a tour
+                            for a specific day, you can edit it.</p>
+                        <a href="{{ url_for('edit_tour_page', tour_id = tour.id) }}" class="btn btn-sand"><i
+                                class="bi bi-pencil-square"></i> Edit tour</a>
+                    </div>
+                    {% elif current_user.is_authenticated and current_user.role == 'guide' %}
+                    <button type="button" class="btn btn-outline-marsala btn-lg" disabled>Guides cannot book
+                        tours</button>
+                    {% elif current_user.is_authenticated and current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-marsala btn-lg">See more info in
+                        the
+                        dashboard</a>
+                    {% else %}
+                    <a href="{{ url_for('login_page') }}" class="btn btn-outline-marsala btn-lg">Log in to Book</a>
+                    {% endif %}
+                </div>
+                </form>
+
+            </div>
+    </div>
+    </aside>
+    </div>
+</main>
+{% endblock %}

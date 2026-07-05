@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if tour %}Edit Tour{% else %}Create tour{% endif %} - MWT{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('home') }}" class="text-decoration-none">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('profile') }}" class="text-decoration-none">Profile</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{% if tour %}Edit Tour{% else %}Create Tour{% endif %}
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<main class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <section class="card modern-card">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                    <h2 class="h4 mb-0 text-center fw-bold text-marsala-primary">{% if tour %}Edit Tour{% else %}Create
+                        a new tour{% endif %}</h2>
+                </div>
+                <div class="card-body">
+                    <form
+                        action="{% if tour %}{{ url_for('edit_tour_page', tour_id=tour.id) }}{% else %}{{ url_for('new_tour') }}{% endif %}"
+                        method="POST" enctype="multipart/form-data">
+
+                        {% if has_reservations %}
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle-fill"></i> This tour already has reservations. You can
+                            only edit the title, description, stops, and photos. Essential information is locked.
+                        </div>
+                        {% endif %}
+
+                        <!-- Tour title -->
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title"
+                                placeholder="Insert the tour title" value="{{ tour.title if tour else '' }}"
+                                minlength="3" required>
+                        </div>
+
+                        <!-- Name of the guide (Read-only) -->
+                        <div class="mb-3">
+                            <label for="guide_name" class="form-label">Guide name</label>
+                            <input type="text" class="form-control" id="guide_name" name="guide_name"
+                                value="{{ current_user.first_name }} {{ current_user.last_name }}" disabled readonly>
+                        </div>
+
+                        <!-- Language -->
+                        <div class="mb-3">
+                            <label for="language" class="form-label">Tour language</label>
+                            <select class="form-select" id="language" name="language" {% if has_reservations
+                                %}disabled{% else %}required{% endif %}>
+                                <option value="" selected disabled>Choose a language...</option>
+                                {% if languages %}
+                                {% for lang in languages %}
+                                <option value="{{ lang.language }}" {% if tour and tour.language==lang.language
+                                    %}selected{% endif %}>{{ lang.language }}</option>
+                                {% endfor %}
+                                {% else %}
+                                <!-- Error handling fallback-->
+                                <option value="null">Error fetching languages</option>
+                                <option value="null">Check for errors in backend</option>
+                                {% endif %}
+                            </select>
+                            <span class="form-text">You can only choose between the languages you set up upon
+                                registering </span>
+                        </div>
+
+                        <!-- Weekly schedule -->
+                        <div class="mb-3">
+                            <label class="form-label">Weekly schedule</label>
+                            <div class="border rounded p-3">
+                                <p class="text-muted small mb-2">Select the days and the starting time for every chosen
+                                    day</p>
+                                {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
+                                'Sunday'] %}
+                                {% for day in days %}
+                                <div class="row mb-2 align-items-center">
+                                    <div class="col-5">
+                                        <div class="form-check">
+                                            <input class="form-check-input day-checkbox" type="checkbox" name="days"
+                                                value="{{ day }}" id="check{{ day }}" {% if scheduled_days_map and day
+                                                in scheduled_days_map %}checked{% endif %} {% if has_reservations
+                                                %}disabled{% endif %}>
+                                            <label class="form-check-label" for="check{{ day }}">
+                                                {{ day }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-7">
+                                        <input type="time" class="form-control form-control-sm time-input"
+                                            name="time_{{ day }}" id="time_{{ day }}" {% if scheduled_days_map and day
+                                            in scheduled_days_map %}value="{{ scheduled_days_map[day] }}" {% if
+                                            has_reservations %}disabled{% endif %} {% else %}disabled{% endif %}>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Tour duration -->
+                        <div class="mb-3">
+                            <label for="duration" class="form-label">Duration (in minutes)</label>
+                            <input type="number" class="form-control" id="duration" name="duration"
+                                placeholder="Enter the duration of the tour in minutes"
+                                value="{{ tour.duration if tour else '' }}" {% if has_reservations %}disabled readonly{%
+                                else %}required{% endif %}>
+                        </div>
+
+                        <!-- Meeting point -->
+                        <div class="mb-3">
+                            <label for="meeting_point" class="form-label">Meeting point</label>
+                            <input type="text" class="form-control" id="meeting_point" name="meeting_point"
+                                placeholder="Choose where you want to meet with the participants for the tour"
+                                value="{{ tour.meeting_point if tour else '' }}" {% if has_reservations %}disabled
+                                readonly{% else %}required{% endif %}>
+                        </div>
+
+                        <!-- Max participants -->
+                        <div class="mb-3">
+                            <label for="max_participants" class="form-label">Maximum number of participants</label>
+                            <input type="number" class="form-control" id="max_participants" name="max_participants"
+                                min="1" placeholder="Choose the max number of participants"
+                                value="{{ tour.max_participants if tour else '' }}" {% if has_reservations %}disabled
+                                readonly{% else %}required{% endif %}>
+                        </div>
+
+                        <!-- Stops -->
+                        <div class="mb-3">
+                            <label class="form-label">Stops list</label>
+                            <div id="stops-container">
+                                {% if tour and tour.stops %}
+                                {% for stop in tour.stops %}
+                                <div class="input-group mb-2 stop-entry">
+                                    <span class="input-group-text">{{ loop.index }}</span>
+                                    <input type="text" class="form-control" name="stops" value="{{ stop }}" required>
+                                    <button class="btn btn-outline-danger remove-stop-btn" type="button" {% if
+                                        loop.index==1 %}disabled{% endif %}>Remove</button>
+                                </div>
+                                {% endfor %}
+                                {% else %}
+                                {% for i in range(4) %}
+                                <div class="input-group mb-2 stop-entry">
+                                    <span class="input-group-text">{{ loop.index }}</span>
+                                    <input type="text" class="form-control" name="stops"
+                                        placeholder="Enter a stop for the tour" required>
+                                    <button class="btn btn-outline-danger remove-stop-btn" type="button"
+                                        disabled>Remove</button>
+                                </div>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-stop-btn">
+                                + Add Stop
+                            </button>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="itinerary" class="form-label">Description</label>
+                            <textarea class="form-control" id="Description" name="description" rows="5"
+                                placeholder="Describe the tour and the main stops..."
+                                required>{{ tour.description if tour else '' }}</textarea>
+                        </div>
+
+                        <!-- Photos -->
+                        <div class="mb-4">
+                            <label for="photos" class="form-label">Tour photos (exactly 5)</label>
+                            <div class="input-group">
+                                <input class="form-control" type="file" id="photos" name="photos" accept="image/*"
+                                    multiple {% if not tour %}required{% endif %}>
+                                <button class="btn btn-outline-danger d-none" type="button" id="clearPhotosBtn"
+                                    title="Clear selection">
+                                    <i class="bi bi-trash"></i> Clear
+                                </button>
+                            </div>
+                            <div class="form-text" id="photo_feedback">
+                                {% if tour %}
+                                Leave empty to keep existing {{ tour.photos|length }} photos, or upload exactly 5 new
+                                ones to replace them.
+                                {% else %}
+                                Select exactly 5 promotional images
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-marsala btn-lg fw-bold">{% if tour %}Update tour{% else
+                                %}Create tour{% endif %}</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+
+{% endblock %}

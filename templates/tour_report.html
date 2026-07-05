@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Tour Report - MWT{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('home') }}" class="text-decoration-none">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('profile') }}" class="text-decoration-none">Profile</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Report</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<main class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <section class="card modern-card">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                    <h2 class="h4 mb-0 text-center fw-bold text-marsala-primary">Post-Tour Report</h2>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="alert border-0 shadow-sm rounded-4 mb-4 info-container">
+                        <div class="d-flex flex-column gap-2">
+                            <span><i class="bi bi-calendar-event text-marsala-primary me-2"></i><strong>Date:</strong>
+                                {{ date_info.date }}</span>
+                            <span><i class="bi bi-people text-marsala-primary me-2"></i><strong>Expected
+                                    Participants:</strong> {{ date_info.actual_participants }}</span>
+                        </div>
+                    </div>
+
+                    <form action="{{ url_for('submit_report', d_id=date_info.id) }}" method="POST"
+                        enctype="multipart/form-data">
+
+                        <div class="mb-4">
+                            <label for="attended_participants" class="form-label fw-bold">Actual Participants Attended
+                                <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control form-control-lg" id="attended_participants"
+                                name="attended_participants" value="{{ date_info.actual_participants }}" min="0"
+                                max="{{ date_info.actual_participants }}" required>
+                            <div class="form-text">Declare the final number of people who took part in the tour.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="report_photo" class="form-label fw-bold">Evidence Photo <span
+                                    class="text-danger">*</span></label>
+                            <input class="form-control form-control-lg" type="file" id="report_photo"
+                                name="report_photo" accept="image/*" {% if not date_info.report_photo %}required{% endif
+                                %}>
+                            <div class="form-text">Upload a photo showing the participants as evidence.</div>
+
+                            {% if date_info.report_photo %}
+                            <div class="mt-3 p-3 border rounded-3 r-photo-container">
+                                <p class="mb-2 text-muted small fw-bold"><i class="bi bi-camera me-1"></i> Current
+                                    photo:</p>
+                                <img src="{{ url_for('static', filename='images/reports/' + date_info.report_photo) }}"
+                                    alt="Report Photo" class="img-fluid rounded shadow-sm r-photo">
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-3 mt-5">
+                            <button type="submit" class="btn btn-marsala btn-lg rounded-pill fw-bold shadow-sm">
+                                {% if date_info.report_photo %}Update Report{% else %}Submit Report{% endif %}
+                            </button>
+                            <a href="{{ url_for('profile') }}"
+                                class="btn btn-outline-marsala btn-lg rounded-pill fw-bold shadow-sm">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+{% endblock %}

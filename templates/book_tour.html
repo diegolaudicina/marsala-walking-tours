@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Book {{ tour.title }} - MWT{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('home') }}" class="text-decoration-none">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('tours_page') }}" class="text-decoration-none">Tours</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('tour_page', tour_id=tour.id) }}"
+                class="text-decoration-none">{{ tour.title }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{% if reservation %}Edit Booking{% else %}Book{% endif %}
+        </li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<main class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="fw-bold mb-4">{% if reservation %}Edit your Reservation{% else %}Complete your Reservation{%
+                endif %}</h1>
+
+            <section class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="card-title">{{ tour.title }}</h4>
+                    <p class="text-muted"><i class="bi bi-geo-alt-fill"></i> Meeting point: {{ tour.meeting_point }}</p>
+
+                    <form
+                        action="{% if reservation %}{{ url_for('edit_booking_page', r_id=reservation.id) }}{% else %}{{ url_for('confirm_booking') }}{% endif %}"
+                        method="POST" id="bookingForm">
+                        <input type="hidden" name="tour_id" value="{{ tour.id }}">
+
+                        <!-- Date Selection -->
+                        <div class="mb-4">
+                            <label for="booking_date" class="form-label fw-bold">Select Date & Time</label>
+                            <select class="form-select" id="booking_date" name="booking_date" required>
+                                <option value="" disabled {% if not selected_date %}selected{% endif %}>Choose a date...
+                                </option>
+                                {% for date in upcoming_dates %}
+                                {% if date.full_date in user_booked_dates and date.full_date != selected_date %}
+                                <option value="" disabled class="text-muted">
+                                    {{ date.display_date }} (Already booked)
+                                </option>
+                                {% elif date.is_overlap %}
+                                <option value="" disabled class="text-danger fw-bold">
+                                    {{ date.display_date }} (Tour overlap)
+                                </option>
+                                {% else %}
+                                <option value="{{ date.full_date }}" data-spots="{{ date.available_spots }}" {% if
+                                    date.full_date==selected_date %}selected{% endif %}>
+                                    {{ date.display_date }}
+                                    {% if date.full_date==selected_date %}
+                                    (Current reservation)
+                                    {% else %}
+                                    ({{ date.available_spots }} spots left)
+                                    {% endif %}
+                                </option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Participants Section -->
+                        <h5 class="fw-bold mt-4 mb-3">Participants</h5>
+                        <p class="text-muted small mb-3">The reservation is by default for yourself. You can add up to 3
+                            additional people, depending on available spots.</p>
+
+                        <div class="alert alert-info py-2 mb-4">
+                            <i class="bi bi-person-check-fill"></i> You are already included in this reservation as the
+                            primary participant.
+                        </div>
+
+                        <div id="additional_participants_container">
+                            <!-- JS will show/hide these based on availability -->
+                            {% for i in range(1, 4) %}
+                            {% set person = extra_participants[i-1] if extra_participants and extra_participants|length
+                            >= i else None %}
+                            <div class="row mb-3 additional-person d-none" id="person_{{ i }}_row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Person {{ i }} First Name</label>
+                                    <input type="text" class="form-control person-input" name="person_{{ i }}_first"
+                                        value="{{ person.first_name if person else '' }}" pattern="[A-Za-z]+"
+                                        minlength="2">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Person {{ i }} Last Name</label>
+                                    <input type="text" class="form-control person-input" name="person_{{ i }}_last"
+                                        value="{{ person.last_name if person else '' }}" pattern="[A-Za-z]+"
+                                        minlength="2">
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <button type="button" class="btn btn-outline-marsala mb-4 d-none" id="addPersonBtn">
+                            <i class="bi bi-person-plus-fill"></i> Add another person
+                        </button>
+                        <button type="button" class="btn btn-outline-sand-accent mb-4 d-none ms-2" id="removePersonBtn">
+                            <i class="bi bi-trash-fill"></i> Remove last person
+                        </button>
+
+                        <div class="d-grid mt-2">
+                            <button type="submit" class="btn btn-marsala btn-lg" id="submitBtn">{% if reservation
+                                %}Update Reservation{% else %}Confirm Reservation{% endif %}</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+{% endblock %}
